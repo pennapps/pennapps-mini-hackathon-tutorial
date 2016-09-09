@@ -1,94 +1,127 @@
-require("script!../lib/matter.min.js");
+import $ from 'jquery';
 
-// Matter aliases
-var Engine = Matter.Engine,
-    World = Matter.World,
-    Bodies = Matter.Bodies,
-    Constraint = Matter.Constraint,
-    Composites = Matter.Composites,
-    MouseConstraint = Matter.MouseConstraint,
-    Events = Matter.Events;
+require("script!../lib/Box2dWeb-2.1.a.3.min.js");
+require("script!../lib/boxbox.min.js");
 
-var engine = Engine.create(document.body, { 
-    render: {
-        options: {
-          background: '../lib/background.png',
-            wireframes: false
-        }
+import { birdConfig } from './Bird.js';
+import { getDist, getDegrees } from './helpers.js';
+import { block } from './Block.js';
+import { pig } from './Pig.js';
+
+var ORIGINX;
+var ORIGINY;
+var XCOOR;
+var YCOOR;
+
+$(document).ready( () => {
+
+  var canvasElem = document.getElementById("game");
+  var ctx = canvasElem.getContext('2d');
+  var world = boxbox.createWorld(canvasElem, {
+    collisionOutlines: false,
+    scale: 45,
+  });
+
+  var bird = world.createEntity(birdConfig, {
+    x: 2,
+    $hit : false,
+    onKeyDown: function(e) {
+      var key = e.key;
+      if (this.$hit === false) {
+        this.$hit = true;
+        world.createEntity(birdConfig, {
+          x: this.position().x + 1,
+          y: this.position().y + 1
+        }).applyImpulse(200, 60);
+        world.createEntity(birdConfig, {
+          x: this.position().x  -1,
+          y: this.position().y - 1
+        }).applyImpulse(200, 60);
+        this.friction(0.1);
+      }
+    },
+    onRender: function(ctx) {
+      ctx.font = "20pt Arial";
+      ctx.fillText("Score: " + this._ops.score, 20, 20);
+    },
+  });
+  
+  world.createEntity({
+    name: "ground",
+    shape: "square",
+    type: "static",
+    color: "rgb(0,100,0)",
+    width: 22,
+    height: 0.5,
+    y: 12
+  });
+
+  
+  block.onImpact = function blockBird(entity, force) {
+    if (entity.name() === "bird") {
+      bird._ops.score++;
+      this.color("black");
     }
-});
-
-var mouse = MouseConstraint.create(engine, {
-    constraint: { stiffness: 1 }
-});
-
-var ground = Bodies.rectangle(395, 600, 815, 50, { 
-    isStatic: true, 
-    render: { 
-      visible: false 
-    } 
-});
-
-var birdOptions = { 
-      render: { 
-        sprite: { 
-          texture: '../lib/angry-bird-icon.png' 
-        } 
-      } 
-    };
-
-var bird = Bodies.polygon(170, 450, 8, 20, birdOptions),
-    anchor = { x: 170, y: 450 },
-    elastic = Constraint.create({ 
-        pointA: anchor, 
-        bodyB: bird, 
-        stiffness: 0.1, 
-        render: { 
-            lineWidth: 5, 
-            strokeStyle: '#dfa417' 
-        } 
-    });
-
-var pyramid = Composites.pyramid(500, 300, 9, 10, 0, 0, function(x, y, column, row) {
-  var texture = column % 2 === 0 ? '../lib/wood.png' : '../lib/glass.png';
-    return Bodies.rectangle(x, y, 25, 40, { render: { sprite: { texture: texture } } });
-});
-
-var ground2 = Bodies.rectangle(610, 250, 200, 20, { 
-    isStatic: true, 
-    render: { 
-        fillStyle: '#edc51e', 
-        strokeStyle: '#b5a91c' 
-    } 
-});
-
-var pyramid2 = Composites.pyramid(550, 0, 5, 10, 0, 0, function(x, y, column, row) {
-  var texture = column % 2 === 0 ? '../lib/wood.png' : '../lib/glass.png';
-    return Bodies.rectangle(x, y, 25, 40, { 
-      render: { 
-        sprite: { 
-          texture: texture 
-        } 
-      } 
-    });
-});
-
-World.add(engine.world, [mouse, ground, pyramid, ground2, pyramid2, bird, elastic]);
-
-Events.on(engine, 'tick', function(event) {
-    if (engine.input.mouse.button === -1 && (bird.position.x > 190 || bird.position.y < 430)) {
-        World.remove(engine.world, [elastic]);
+    if (force > 100 && entity.name() !== "aground") {
+      this.destroy();
     }
-});
-
-Events.on(engine, 'collisionActive', function(event) {
-  let i, pair,
-    length = event.pairs.length;
-  for(i = 0; i < length; i++) {
-    pair = event.pairs[i];
-    console.log(pair.bodyA.label);
-    console.log(pair.bodyB.label);
   }
+  pig.onImpact = function(entity, force) {
+    if (force > 75 && entity.name() !== "ground") {
+      this.destroy();
+    }
+  }
+  world.createEntity(block, {
+    x: 13,
+  });
+
+  world.createEntity(block, {
+    x: 19,
+  });
+
+  world.createEntity(block, {
+    x: 16,
+    y: 7,
+    width: 7,
+    height: 0.5,
+  });
+
+  world.createEntity(block, {
+    x: 14,
+    y: 6,
+    height: 3,
+  });
+
+  world.createEntity(block, {
+    x: 18,
+    y: 6,
+    height: 3,
+  });
+
+  world.createEntity(block, {
+    x: 16,
+    y: 4,
+    width: 5,
+    height: 0.5,
+  });
+
+  world.createEntity(pig);
+  
+  world.createEntity(pig, {
+    y: 6.3,
+  });
+
+  world.createEntity({
+    x: 20.75,
+    y: 0,
+    type: "static",
+    height: 23.5,
+    name: "block",
+    shape: "square",
+    color: "black",
+    borderColor: "black",
+    width: 0.1
+  });
+
 });
 
-Engine.run(engine);
