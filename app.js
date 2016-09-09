@@ -70,37 +70,46 @@
 	__webpack_require__(4);
 	__webpack_require__(7);
 
-	var ORIGINX;
-	var ORIGINY;
-	var XCOOR;
-	var YCOOR;
-
 	(0, _jquery2.default)(document).ready(function () {
 
 	  var canvasElem = document.getElementById("game");
 	  var ctx = canvasElem.getContext('2d');
+
+	  // create boxbox world 45 px = 1 meter
 	  var world = boxbox.createWorld(canvasElem, {
 	    collisionOutlines: false,
 	    scale: 45
 	  });
 
+	  // add ground as static element
+	  world.createEntity({
+	    name: "ground",
+	    shape: "square",
+	    type: "static",
+	    color: "rgb(0,100,0)",
+	    width: 50,
+	    height: 0.5,
+	    y: 12
+	  });
+
+	  /** BIRD CONSTRUCTION **/
+	  // see the Bird.js file. Need to specify OnKeyDown and OnRender in this scope
 	  var bird = world.createEntity(_Bird.birdConfig, {
 	    x: 2,
+	    score: 0,
 	    $hit: false,
 	    onKeyDown: function onKeyDown(e) {
-	      var key = e.key;
-	      if (this.$hit === false) {
-	        this.$hit = true;
-	        world.createEntity(_Bird.birdConfig, {
-	          x: this.position().x + 1,
-	          y: this.position().y + 1
-	        }).applyImpulse(200, 60);
-	        world.createEntity(_Bird.birdConfig, {
-	          x: this.position().x - 1,
-	          y: this.position().y - 1
-	        }).applyImpulse(200, 60);
-	        this.friction(0.1);
-	      }
+	      this.$hit = true;
+	      this.applyImpulse(200, 60);
+	      world.createEntity(_Bird.birdConfig, {
+	        x: this.position().x + 1,
+	        y: this.position().y + 1
+	      }).applyImpulse(200, 60);
+	      world.createEntity(_Bird.birdConfig, {
+	        x: this.position().x - 1,
+	        y: this.position().y - 1
+	      }).applyImpulse(200, 60);
+	      this.friction(0.1);
 	    },
 	    onRender: function onRender(ctx) {
 	      ctx.font = "20pt Arial";
@@ -108,17 +117,9 @@
 	    }
 	  });
 
-	  world.createEntity({
-	    name: "ground",
-	    shape: "square",
-	    type: "static",
-	    color: "rgb(0,100,0)",
-	    width: 22,
-	    height: 0.5,
-	    y: 12
-	  });
+	  /** BLOCK CONSTRUCTION **/
 
-	  _Block.block.onImpact = function blockBird(entity, force) {
+	  _Block.block.onImpact = function (entity, force) {
 	    if (entity.name() === "bird") {
 	      bird._ops.score++;
 	      this.color("black");
@@ -127,61 +128,30 @@
 	      this.destroy();
 	    }
 	  };
+	  var blockArr = [{ x: 19 }, { x: 16, y: 7, width: 7, height: 0.5 }, { x: 14, y: 6, height: 3 }, { x: 18, y: 6, height: 3 }, { x: 16, y: 4, width: 5, height: 0.5 }, { x: 13, color: "grey", onImpact: function onImpact(entity, force) {
+	      if (entity.name() === "bird") {
+	        bird._ops.score++;
+	        this.color("white");
+	      }
+	      if (force > 75 && entity.name() !== "aground") {
+	        this.destroy();
+	      }
+	    }
+	  }];
+	  blockArr.map(function (el) {
+	    world.createEntity(_Block.block, el);
+	  });
+
+	  /** PIG CONSTRUCTION **/
+
 	  _Pig.pig.onImpact = function (entity, force) {
 	    if (force > 75 && entity.name() !== "ground") {
 	      this.destroy();
 	    }
 	  };
-	  world.createEntity(_Block.block, {
-	    x: 13
-	  });
-
-	  world.createEntity(_Block.block, {
-	    x: 19
-	  });
-
-	  world.createEntity(_Block.block, {
-	    x: 16,
-	    y: 7,
-	    width: 7,
-	    height: 0.5
-	  });
-
-	  world.createEntity(_Block.block, {
-	    x: 14,
-	    y: 6,
-	    height: 3
-	  });
-
-	  world.createEntity(_Block.block, {
-	    x: 18,
-	    y: 6,
-	    height: 3
-	  });
-
-	  world.createEntity(_Block.block, {
-	    x: 16,
-	    y: 4,
-	    width: 5,
-	    height: 0.5
-	  });
-
-	  world.createEntity(_Pig.pig);
-
-	  world.createEntity(_Pig.pig, {
-	    y: 6.3
-	  });
-
-	  world.createEntity({
-	    x: 20.75,
-	    y: 0,
-	    type: "static",
-	    height: 23.5,
-	    name: "block",
-	    shape: "square",
-	    color: "black",
-	    borderColor: "black",
-	    width: 0.1
+	  var pigArr = [{}, { y: 6.3 }];
+	  pigArr.map(function (el) {
+	    world.createEntity(_Pig.pig, el);
 	  });
 	});
 
