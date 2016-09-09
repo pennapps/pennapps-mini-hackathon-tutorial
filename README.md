@@ -5,7 +5,7 @@ A mini-project for a mini-hackathon
 
 ## Overview
 
-![Introduction Image](assets/README/intro.png)![moving image](assets/README/moving.png)
+![moving image](assets/README/moving.png)
 
 This is a very basic implementation of Angry Birds in JavaScript. Currently, the implementation features several basic abilities of the 'Angry Birds' game including the ability for birds to have special abilities (e.g. this implementation has a default ability for the blue bird to split into 3). Also there are multiple block types and of course the pigs, all of which break in response to collisions. 
 
@@ -15,11 +15,14 @@ This write up was made for PennApps XIV by Abhinav Suri as part of the mini-hack
 
 ## Setup
 
+
 We assume you have some knowledge of command line. Please install Node so you can get access to npm. 
 
 After installing node, download this repository and run `npm install` to get all the dependencies this project requires onto your local machine. We will be using some ES6 in this project as appropriate (the boxbox physics simulator has a lot of parts that are still only ES5 compatible right now). 
 
 After that you can run `npm run start:dev` to start a webpack build and load the page. You should see a working implementation at localhost:8080 or whatever the equivalent is for your computer.
+
+![Introduction Image](assets/README/intro.png)
 
 Also note that `npm run build` will condense all the app files into the single `app.js` file. This should only be run at the end.
 
