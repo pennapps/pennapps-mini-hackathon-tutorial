@@ -5,7 +5,7 @@ A mini-project for a mini-hackathon
 
 ## Overview
 
-![Introduction Image]('./assets/README/intro.png')
+![Introduction Image](assets/README/intro.png)![moving image](assets/README/moving.png)
 
 This is a very basic implementation of Angry Birds in JavaScript. Currently, the implementation features several basic abilities of the 'Angry Birds' game including the ability for birds to have special abilities (e.g. this implementation has a default ability for the blue bird to split into 3). Also there are multiple block types and of course the pigs, all of which break in response to collisions. 
 
