@@ -10,7 +10,7 @@ import { createGround, groundConfig } from 'components/sprites/Ground.js';
 import { createBlock, blockConfig } from 'components/sprites/Block.js';
 import { createPig, pigConfig } from 'components/sprites/Pig.js';
 
-let anchorX, anchorY, mouseX, mouseY = null;
+let anchorX, anchorY, mouseX, mouseY = 0;
 const PLATFORM_X = 3;
 const PLATFORM_Y = 6;
 const SCALE = 45;

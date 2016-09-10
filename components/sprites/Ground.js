@@ -1,6 +1,7 @@
 let groundConfig = {
   name: "ground",
   shape: "square",
+  color: "green",
   type: "static",
   width: 50,
   height: 10,

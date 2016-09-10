@@ -21,7 +21,7 @@ let createPig = (x, y, radius) => {
       radius: radius,
       $hits: 0,
       onImpact: function (entity, normal, tangential) {
-        if (normal > 10 && entity.name() !== "ground") {
+        if (normal > 10) {
           window.world._ops.$score++;
           this.$hits += normal;
         }

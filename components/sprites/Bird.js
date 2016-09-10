@@ -32,10 +32,6 @@ let createBird = (type, x, y, canSplit = true) => {
     return window.world.createEntity( birdConfig, {
       x: x,
       y: y,
-      $prevX: x,
-      $prevY: y,
-      $velX: 0,
-      $velY: 0,
       radius: BIRD_TYPES[type]['radius'],
       image: BIRD_TYPES[type]['image'],
       $abilityTriggered: false,
@@ -54,14 +50,6 @@ let createBird = (type, x, y, canSplit = true) => {
         if (this.$hits > 3) {
           this.destroy();
         }
-      },
-      onTick: function() {
-        this.$prevX = this.$x,
-        this.$prevY = this.$y,
-        this.$x = this.position().x * window.world._ops.scale;
-        this.$y = this.position().y * window.world._ops.scale;;
-        this.$velX = this.$x - this.$prevX;
-        this.$velY = this.$x - this.$prevY;
       },
       onKeyDown: function (e) {
         if (this.$abilityTriggered === false && this.$canSplit === true && this.$hasShot === true) {
