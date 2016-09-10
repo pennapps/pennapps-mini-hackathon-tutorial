@@ -1,8 +1,9 @@
 # PennApps-Mini-Hackathon: Angry Birds
 
+### Demo At: [http://pennapps-mini.herokuapp.com](http://pennapps-mini.herokuapp.com)
+
 ####A mini-project for a mini-hackathon
 Code + Tutorial By: Abhinav Suri
-
 
 
 ## Overview
@@ -98,7 +99,7 @@ Note here we are using the ES6 import syntax. We are explicitly requiring Boxbox
 
 Next we declare some constants: 
 
-```
+```javascript
 let anchorX, anchorY, mouseX, mouseY = 0;
 const PLATFORM_X = 3;
 const PLATFORM_Y = 6;
@@ -224,7 +225,7 @@ We lastly create an array of birds that will be fired. When the page is initiall
 
 Perhaps the most complicated rendering process is for the birds because there are multiple types and different abilities. We will be implementing the classic Red bird and Blue bird from angry birds. The Red Bird can be shot of the pigs. The Blue Bird can do the same as well but can also split into 3 birds midair to maxmize impact. We will implement this by splitting the birds after the user hits a key after launching the bird. 
 
-```
+```javascript
 require("script!lib/Box2dWeb-2.1.a.3.min.js");
 require("script!lib/boxbox.min.js");
 
@@ -258,7 +259,7 @@ The above piece of code sets up some basic constants to refer to while construct
 
 ![Red Image](assets/README/red.png)
 
-```
+```javascript
 let createBird = (type, x, y, canSplit = true) => {
   if (!window.world) {
     console.log("BINDING ERROR: NO WORLD ATTRIBUTE IN WINDOW");
