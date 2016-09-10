@@ -1,6 +1,8 @@
 # PennApps-Mini-Hackathon: Angry Birds
 
-A mini-project for a mini-hackathon
+####A mini-project for a mini-hackathon
+Code + Tutorial By: Abhinav Suri
+
 
 
 ## Overview
@@ -57,6 +59,8 @@ The `module` key specifies specific configuration about how the webpack should h
 
 The process of transpiling code, requiring it in the right order, and then moving it into the right order is very resource intensive and time consuming. So we will use a tool called `web-dev-server` to allow us to _hot-reload_ our file (i.e. as we save a file, it will be merged with a state tree and only the changes that we actually need will be made rather than remaking the entire file). So as we save our work, the changes will instantaneously reappear in the web browser.
 
+![Red Image](assets/README/webpack.png)
+
 ## Part 3: Planning the Game
 
 On the high level, we define what we want to make in order to have a clear goal in mind while programming. In the game of angry birds, at the most level, there are `birds` with different abilities which can have some abilities which clicked. There are also different types of `blocks` with differing level of 'life' and they break under certain amounts of force. There are also `pigs` which `birds` can break and must break to win the game. We can also have a `ground` component which will be a static platform that hold everything else.
@@ -64,6 +68,8 @@ On the high level, we define what we want to make in order to have a clear goal 
 On a lower level. The `birds` must have a lot of the same characters. They definitely have a x and y coordinate, some velocity, an image to represent it, some force at which it will break, some radius and so on. So it would make sense for our implementation to have separate `sprites` for each of the objects mentioned above.
 
 We must also keep some kind of scoring component in order to quantify how well we did in the game. We won't go too much into how score should be determined, but the more pigs you destroy, the higher your score should be.
+
+
 
 ## Part 4: Physics with Boxbox
 
@@ -250,6 +256,7 @@ let birdConfig = {
 
 The above piece of code sets up some basic constants to refer to while constructing the bird objects themselves. We have two types of birds, with different forces needed to destroy them, different images, and radii (though not in this case). Also note that the birdConfig object contains all the the common charactersitics/defaults of the birds.
 
+![Red Image](assets/README/red.png)
 
 ```
 let createBird = (type, x, y, canSplit = true) => {
@@ -327,7 +334,7 @@ var app = express();
 app.use(express.static(path.join(__dirname)));
 
 app.get('*', function (req, res) {
-  res.send(path.join(__dirname, 'public', 'index.html'));
+  res.send(path.join(__dirname, 'index.html'));
 });
 
 var PORT = process.env.PORT || 8080
@@ -339,7 +346,11 @@ app.listen(PORT, function() {
 
 We require express (the webserver) and path (a simple way to deal with system and relative paths in javascript). We then initiate the express application and `use` express middleware to tell the server that there exists some static content (aka our site) in the current directory.
 
-Whenever a GET request is made to the website, we wildcard match against all the possible paths and just send them the index.html file.
+Whenever a GET request is made to the website, we wildcard match against all the possible paths and just send them the index.html file (which does contain the app.js file).
+
+We then bind express to a port on our localhost. 
+
+By running `npm run start` you'll be able to access your website at http://localhost:8080.
 
 The best and free way to do this is to go to Heroku and register an account. Install the Heroku CLI as well.
 
@@ -357,4 +368,18 @@ Do `git commit -m "Some commit message here`
 
 And lastly `git push heroku master` to push the code to the remote heroku repository which will migrate your code over to a web server.
 
-If all goes well with the installation. Then you should be up and running.
+If all goes well with the installation. Then you should be up and running. If you have any issues, run `heroku logs --tail`.
+
+![Command Line Image](assets/README/heroku.png)
+
+## Suggestions for what to add
+
+The remaining birds in angry birds
+
+- Yellow bird (onKeydown make bird faster)
+- Black bird (onKeydown make bird explode and apply impluse to all objects)
+- Create a leaderboard for yourself
+- Create a global leaderboard for all individuals who play the game on your website
+- Implement multiplayer with websockets and be able to see the other player make moves in real time
+
+
