@@ -13,9 +13,6 @@ let blockConfig = {
   name: "block",
   shape: "square",
   color: "brown",
-  width: 0.5,
-  height: 4,
-  y: 10,
 };
 
 let createBlock = (x, y, width, height, type, gravity = true) => {

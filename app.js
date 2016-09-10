@@ -76,15 +76,21 @@
 	    anchorY = void 0,
 	    mouseX = void 0,
 	    mouseY = null;
-
+	var PLATFORM_X = 3;
+	var PLATFORM_Y = 6;
+	var SCALE = 45;
 	(0, _jquery2.default)(document).ready(function () {
 
 	  var canvasElem = document.getElementById("game");
 	  var ctx = canvasElem.getContext('2d');
+	  canvasElem.width = window.innerWidth;
+	  canvasElem.height = window.innerHeight;
+	  /** WORLD SETUP **/
 
 	  window.world = boxbox.createWorld(canvasElem, {
 	    collisionOutlines: false,
-	    $score: 0
+	    $score: 0,
+	    scale: SCALE
 	  });
 
 	  window.world.onRender(function (ctx) {
@@ -92,11 +98,28 @@
 	    ctx.fillText("Score: " + this._ops.$score, 20, 20);
 	    if (anchorX && anchorY && mouseX && mouseY) {
 	      ctx.beginPath();
-	      ctx.moveTo(anchorX, anchorY);
-	      ctx.lineTo(mouseX, mouseY);
+	      ctx.moveTo(PLATFORM_X * SCALE, (-bird._ops.radius + PLATFORM_Y) * SCALE);
+	      console.log(bird);
+	      ctx.lineTo(PLATFORM_X * SCALE + (anchorX - mouseX), PLATFORM_Y * SCALE + (anchorY - mouseY));
 	      ctx.stroke();
 	    }
 	  });
+
+	  window.world.onTick(function () {
+	    var foundEls = window.world.find(1, 2, 5, 8);
+	    var found = false;
+	    for (var i = 0; i < foundEls.length; i++) {
+	      if (foundEls[i]._name === 'bird') {
+	        found = true;
+	      } else {}
+	    }
+	    if (found === false && birdArr.length > 0) {
+	      birdObj = birdArr.pop();
+	      bird = _Bird.createBird.bind(window)(birdObj.type, birdObj.x, birdObj.y, birdObj.canSplit);
+	    }
+	  });
+
+	  /** CLICK LISTENER SETUP **/
 
 	  (0, _jquery2.default)('#game').on('mousedown', function (e) {
 	    anchorX = e.offsetX;
@@ -107,27 +130,33 @@
 	    });
 	  }).on('mouseup', function (e) {
 	    (0, _jquery2.default)(this).unbind('mousemove');
+	    var dist = (0, _helpers.getDist)(anchorX, anchorY, mouseX, mouseY);
+	    var degrees = (0, _helpers.getDegrees)(anchorX, anchorY, mouseX, mouseY);
+	    if (!bird.$hasShot) {
+	      bird.applyImpulse(dist * 0.25, degrees);
+	      bird.$hasShot = true;
+	    }
 	    anchorX, anchorY, mouseX, mouseY = null;
 	  }).on('mouseout', function (e) {
 	    (0, _jquery2.default)(this).unbind('mousemove');
 	    anchorX, anchorY, mouseX, mouseY = null;
 	  });
 
-	  /** GROUND CONSTRUCTION **/
-	  var ground = _Ground.createGround.bind(window)();
-
 	  /** BIRD CONSTRUCTION **/
-	  var bird = _Bird.createBird.bind(window)('blue', 3, 6);
-	  var block = console.log(bird);
-	  /** BLOCK CONSTRUCTION **/
-	  var blockArr = [{ x: 19, y: 7, width: 7, height: 0.5, type: 'glass' }, { x: 16, y: 7, width: 7, height: 0.5, type: 'wood' }, { x: 14, y: 6, width: 3, height: 4, type: 'stone' }, { x: 18, y: 6, width: 1, height: 3, type: 'glass' }, { x: 3, y: 6, width: 0.5, height: 0.1, type: 'stone', gravity: false }, { x: 16, y: 4, width: 5, height: 0.5, type: 'wood' }];
+	  var birdArr = [{ type: 'blue', x: PLATFORM_X, y: PLATFORM_Y, canSplit: true }, { type: 'red', x: PLATFORM_X, y: PLATFORM_Y, canSplit: false }, { type: 'blue', x: PLATFORM_X, y: PLATFORM_Y, canSplit: true }];
+	  var birdObj = birdArr.pop();
+	  var bird = _Bird.createBird.bind(window)(birdObj.type, birdObj.x, birdObj.y, birdObj.canSplit);
 
+	  /** GROUND AND PLATFORM CONSTRUCTION **/
+	  var ground = _Ground.createGround.bind(window)();
+	  var platform = _Block.createBlock.bind(window)(PLATFORM_X, PLATFORM_Y, 1, 0.3, 'stone', false);
+	  /** BLOCK CONSTRUCTION **/
+	  var blockArr = [{ x: 19, y: 11, width: 2, height: 1, type: 'stone' }, { x: 17, y: 11, width: 2, height: 1, type: 'stone' }, { x: 13, y: 11, width: 2, height: 1, type: 'stone' }, { x: 11, y: 11, width: 2, height: 1, type: 'stone' }, { x: 15, y: 10, width: 4, height: 0.5, type: 'wood' }, { x: 12, y: 10, width: 2, height: 1, type: 'wood' }, { x: 18, y: 10, width: 2, height: 1, type: 'wood' }, { x: 19, y: 10, width: 1, height: 1, type: 'wood' }, { x: 11, y: 10, width: 1, height: 1, type: 'wood' }, { x: 11, y: 9, width: 2, height: 1, type: 'wood' }, { x: 19, y: 9, width: 2, height: 1, type: 'wood' }, { x: 12, y: 9, width: 1, height: 1, type: 'wood' }, { x: 18, y: 9, width: 1, height: 1, type: 'wood' }, { x: 18, y: 5, width: .5, height: 3, type: 'wood' }, { x: 19, y: 5, width: .5, height: 3, type: 'stone' }, { x: 11, y: 5, width: .5, height: 3, type: 'stone' }, { x: 12, y: 5, width: .5, height: 3, type: 'wood' }, { x: 11.5, y: 3, width: 4, height: 0.5, type: 'wood' }, { x: 18.5, y: 3, width: 4, height: 0.5, type: 'wood' }, { x: 17.5, y: 2, width: 0.5, height: 0.5, type: 'glass' }, { x: 19.5, y: 2, width: 0.5, height: 0.5, type: 'glass' }, { x: 10.5, y: 2, width: 0.5, height: 0.5, type: 'glass' }, { x: 12.5, y: 2, width: 0.5, height: 0.5, type: 'glass' }];
 	  blockArr.map(function (el) {
 	    _Block.createBlock.bind(window)(el.x, el.y, el.width, el.height, el.type, el.gravity);
 	  });
-	  /** PIG CONSTRUCTION **/
-	  var pigArr = [{ x: 16.5, y: 11, radius: 1 }, { x: 16.5, y: 6.3, radius: 2 }];
-
+	  //* PIG CONSTRUCTION *//
+	  var pigArr = [{ x: 15, y: 8, radius: 1 }, { x: 11.5, y: 1.5, radius: 0.5 }, { x: 18.5, y: 1.5, radius: 0.5 }];
 	  pigArr.map(function (el) {
 	    _Pig.createPig.bind(window)(el.x, el.y, el.radius);
 	  });
@@ -10215,13 +10244,21 @@
 
 /***/ },
 /* 3 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+	exports.timerHelper = exports.getDegrees = exports.getDist = undefined;
+
+	var _jquery = __webpack_require__(2);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 	function getDist(x1, y1, x2, y2) {
 	  return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
 	}
@@ -10264,8 +10301,6 @@
 	__webpack_require__(5);
 	__webpack_require__(8);
 
-	var DEFAULT_X = 2;
-	var DEFAULT_Y = 11;
 	var FORCE_THRESHOLD = 50;
 	var TIMEOUT_CONST = 5000;
 	var BIRD_TYPES = {
@@ -10276,19 +10311,16 @@
 	  },
 	  'red': {
 	    force: 75,
-	    image: "https://dl.dropbox.com/u/200135/imgs/red-bird.gif",
-	    radius: 1
+	    image: "http://vignette2.wikia.nocookie.net/angrybirds/images/5/51/7632301_2.png/revision/latest/scale-to-width-down/200?cb=20120817021529",
+	    radius: 0.5
 	  }
 	};
 	var birdConfig = {
 	  name: "bird",
 	  shape: "circle",
-	  radius: 1,
 	  image: "https://dl.dropbox.com/u/200135/imgs/blue-bird.gif",
 	  imageStretchToFit: true,
-	  density: 4,
-	  x: DEFAULT_X,
-	  y: DEFAULT_Y
+	  density: 4
 	};
 
 	var createBird = function createBird(type, x, y) {
@@ -10300,11 +10332,16 @@
 	    return window.world.createEntity(birdConfig, {
 	      x: x,
 	      y: y,
+	      $prevX: x,
+	      $prevY: y,
+	      $velX: 0,
+	      $velY: 0,
 	      radius: BIRD_TYPES[type]['radius'],
 	      image: BIRD_TYPES[type]['image'],
 	      $abilityTriggered: false,
 	      $canSplit: canSplit,
 	      $hits: 0,
+	      $hasShot: false,
 	      $timer: null,
 	      onImpact: function onImpact(entity, normal, tangential) {
 	        if (normal > 5) {
@@ -10318,14 +10355,25 @@
 	          this.destroy();
 	        }
 	      },
+	      onTick: function onTick() {
+	        this.$prevX = this.$x, this.$prevY = this.$y, this.$x = this.position().x * window.world._ops.scale;
+	        this.$y = this.position().y * window.world._ops.scale;;
+	        this.$velX = this.$x - this.$prevX;
+	        this.$velY = this.$x - this.$prevY;
+	      },
 	      onKeyDown: function onKeyDown(e) {
-	        if (this.$abilityTriggered === false && this.$canSplit === true) {
+	        if (this.$abilityTriggered === false && this.$canSplit === true && this.$hasShot === true) {
 	          this.$abilityTriggered = true;
-	          var birdA = createBird('blue', this.position().x + 1, this.position().y - 1, false);
-	          var birdB = createBird('blue', this.position().x - 1, this.position().y - 1, false);
-	          this.applyImpulse(200, 60);
-	          birdA.applyImpulse(200, 60);
-	          birdB.applyImpulse(200, 60);
+	          var birdA = createBird(type, this.position().x + 1, this.position().y - 1, false);
+	          var birdB = createBird(type, this.position().x - 1, this.position().y - 1, false);
+	          var velX = this._body.m_linearVelocity.x;
+	          var velY = this._body.m_linearVelocity.y;
+	          var magnitude = Math.sqrt(velX * velX + velY * velY);
+	          var degrees = -90 - Math.atan(velY, velX) * 180 / Math.PI;
+
+	          this.applyImpulse(magnitude, velX, velY);
+	          birdA.applyImpulse(magnitude, velX, velY);
+	          birdB.applyImpulse(magnitude, velX, velY);
 	        }
 	      }
 	    });
@@ -10387,10 +10435,9 @@
 	  name: "ground",
 	  shape: "square",
 	  type: "static",
-	  color: "rgb(0,100,0)",
 	  width: 50,
-	  height: 0.5,
-	  y: 12
+	  height: 10,
+	  y: 14
 	};
 
 	var createGround = function createGround() {
@@ -10429,10 +10476,7 @@
 	var blockConfig = {
 	  name: "block",
 	  shape: "square",
-	  color: "brown",
-	  width: 0.5,
-	  height: 4,
-	  y: 10
+	  color: "brown"
 	};
 
 	var createBlock = function createBlock(x, y, width, height, type) {
@@ -10473,17 +10517,14 @@
 	__webpack_require__(5);
 	__webpack_require__(8);
 
-	var FORCE_MULTIPLIER = 100;
+	var FORCE_MULTIPLIER = 150;
 
 	var pigConfig = {
 	  name: "pig",
 	  shape: "circle",
-	  radius: 1,
 	  image: "https://dl.dropbox.com/u/200135/imgs/soldier-pig.png",
 	  imageStretchToFit: true,
-	  density: 4,
-	  x: 16.5,
-	  y: 11
+	  density: 4
 	};
 
 	var createPig = function createPig(x, y, radius) {
@@ -10498,7 +10539,7 @@
 	      onImpact: function onImpact(entity, normal, tangential) {
 	        if (normal > 10 && entity.name() !== "ground") {
 	          window.world._ops.$score++;
-	          this.$hits++;
+	          this.$hits += normal;
 	        }
 	        if (this.$hits > radius * FORCE_MULTIPLIER) {
 	          this.destroy();

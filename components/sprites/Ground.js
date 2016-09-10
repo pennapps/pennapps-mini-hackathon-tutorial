@@ -2,10 +2,9 @@ let groundConfig = {
   name: "ground",
   shape: "square",
   type: "static",
-  color: "rgb(0,100,0)",
   width: 50,
-  height: 0.5,
-  y: 12
+  height: 10,
+  y: 14
 };
 
 let createGround = () => {

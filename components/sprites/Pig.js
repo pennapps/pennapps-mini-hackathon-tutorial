@@ -1,17 +1,14 @@
 require("script!lib/Box2dWeb-2.1.a.3.min.js");
 require("script!lib/boxbox.min.js");
 
-const FORCE_MULTIPLIER = 100;
+const FORCE_MULTIPLIER = 150;
 
 let pigConfig = {
   name: "pig",
   shape: "circle",
-  radius: 1,
   image: "https://dl.dropbox.com/u/200135/imgs/soldier-pig.png",
   imageStretchToFit: true,
   density: 4,
-  x: 16.5,
-  y: 11,
 };
 
 let createPig = (x, y, radius) => {
@@ -26,7 +23,7 @@ let createPig = (x, y, radius) => {
       onImpact: function (entity, normal, tangential) {
         if (normal > 10 && entity.name() !== "ground") {
           window.world._ops.$score++;
-          this.$hits++;
+          this.$hits += normal;
         }
         if (this.$hits > radius * FORCE_MULTIPLIER) {
           this.destroy();

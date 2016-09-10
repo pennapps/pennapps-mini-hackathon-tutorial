@@ -3,8 +3,6 @@ require("script!lib/boxbox.min.js");
 
 import { timerHelper } from 'components/helpers.js';
 
-const DEFAULT_X = 2;
-const DEFAULT_Y = 11;
 const FORCE_THRESHOLD = 50;
 const TIMEOUT_CONST = 5000;
 const BIRD_TYPES = {
@@ -15,19 +13,16 @@ const BIRD_TYPES = {
   },
   'red' : {
     force: 75,
-    image: "https://dl.dropbox.com/u/200135/imgs/red-bird.gif",
-    radius: 1
+    image: "http://vignette2.wikia.nocookie.net/angrybirds/images/5/51/7632301_2.png/revision/latest/scale-to-width-down/200?cb=20120817021529",
+    radius: 0.5
   }
 }
 let birdConfig = {
     name: "bird",
     shape: "circle",
-    radius: 1,
     image: "https://dl.dropbox.com/u/200135/imgs/blue-bird.gif",
     imageStretchToFit: true,
     density: 4,
-    x: DEFAULT_X,
-    y: DEFAULT_Y
 };
 
 let createBird = (type, x, y, canSplit = true) => {
@@ -37,11 +32,16 @@ let createBird = (type, x, y, canSplit = true) => {
     return window.world.createEntity( birdConfig, {
       x: x,
       y: y,
+      $prevX: x,
+      $prevY: y,
+      $velX: 0,
+      $velY: 0,
       radius: BIRD_TYPES[type]['radius'],
       image: BIRD_TYPES[type]['image'],
       $abilityTriggered: false,
       $canSplit: canSplit,
       $hits: 0,
+      $hasShot: false,
       $timer: null, 
       onImpact: function (entity, normal, tangential) {
         if ( normal > 5 ) {
@@ -55,14 +55,27 @@ let createBird = (type, x, y, canSplit = true) => {
           this.destroy();
         }
       },
+      onTick: function() {
+        this.$prevX = this.$x,
+        this.$prevY = this.$y,
+        this.$x = this.position().x * window.world._ops.scale;
+        this.$y = this.position().y * window.world._ops.scale;;
+        this.$velX = this.$x - this.$prevX;
+        this.$velY = this.$x - this.$prevY;
+      },
       onKeyDown: function (e) {
-        if (this.$abilityTriggered === false && this.$canSplit === true) {
+        if (this.$abilityTriggered === false && this.$canSplit === true && this.$hasShot === true) {
           this.$abilityTriggered = true;
-          let birdA = createBird('blue', this.position().x + 1, this.position().y - 1, false);
-          let birdB = createBird('blue', this.position().x - 1, this.position().y - 1, false);
-          this.applyImpulse(200,60);
-          birdA.applyImpulse(200,60); 
-          birdB.applyImpulse(200,60);
+          let birdA = createBird(type, this.position().x + 1, this.position().y - 1, false);
+          let birdB = createBird(type, this.position().x - 1, this.position().y - 1, false);
+          let velX = this._body.m_linearVelocity.x;
+          let velY = this._body.m_linearVelocity.y;
+          let magnitude = Math.sqrt((velX * velX) + (velY * velY));
+          let degrees = -90-(Math.atan(velY, velX) * 180/ Math.PI);
+
+          this.applyImpulse(magnitude,velX, velY);
+          birdA.applyImpulse(magnitude,velX, velY); 
+          birdB.applyImpulse(magnitude,velX, velY);
         }
       },
     });
