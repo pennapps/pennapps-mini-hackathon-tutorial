@@ -4,6 +4,7 @@
   "description": "A mini angry birds implementation written in javascript",
   "main": "app.js",
   "scripts": {
+    "start": "node server.js",
     "start:dev": "webpack-dev-server",
     "build": "webpack"
   },

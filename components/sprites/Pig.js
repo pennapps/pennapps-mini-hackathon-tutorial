@@ -1,7 +1,9 @@
 require("script!lib/Box2dWeb-2.1.a.3.min.js");
 require("script!lib/boxbox.min.js");
 
-var pig = {
+const FORCE_MULTIPLIER = 100;
+
+let pigConfig = {
   name: "pig",
   shape: "circle",
   radius: 1,
@@ -12,4 +14,26 @@ var pig = {
   y: 11,
 };
 
-export { pig };
+let createPig = (x, y, radius) => {
+  if (!window.world) {
+    console.log("BINDING ERROR: NO WORLD ATTRIBUTE IN WINDOW");
+  } else {
+    return window.world.createEntity( pigConfig, {
+      x: x,
+      y: y,
+      radius: radius,
+      $hits: 0,
+      onImpact: function (entity, normal, tangential) {
+        if (normal > 10 && entity.name() !== "ground") {
+          window.world._ops.$score++;
+          this.$hits++;
+        }
+        if (this.$hits > radius * FORCE_MULTIPLIER) {
+          this.destroy();
+          window.world._ops.$score += radius * FORCE_MULTIPLIER;
+        }
+      },
+    });
+  }
+}
+export { pigConfig, createPig };
