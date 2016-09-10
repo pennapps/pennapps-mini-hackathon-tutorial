@@ -6,7 +6,7 @@ var app = express();
 app.use(express.static(path.join(__dirname)));
 
 app.get('*', function (req, res) {
-  res.send(path.join(__dirname, 'public', 'index.html'));
+  res.send(path.join(__dirname, 'index.html'));
 });
 
 var PORT = process.env.PORT || 8080

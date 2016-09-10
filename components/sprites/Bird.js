@@ -59,11 +59,9 @@ let createBird = (type, x, y, canSplit = true) => {
           let velX = this._body.m_linearVelocity.x;
           let velY = this._body.m_linearVelocity.y;
           let magnitude = Math.sqrt((velX * velX) + (velY * velY));
-          let degrees = -90-(Math.atan(velY, velX) * 180/ Math.PI);
-
           this.applyImpulse(magnitude,velX, velY);
-          birdA.applyImpulse(magnitude,velX, velY); 
-          birdB.applyImpulse(magnitude,velX, velY);
+          birdA.applyImpulse(magnitude,velX-1, velY-1); 
+          birdB.applyImpulse(magnitude,velX+1, velY+1);
         }
       },
     });
