@@ -75,7 +75,7 @@
 	var anchorX = void 0,
 	    anchorY = void 0,
 	    mouseX = void 0,
-	    mouseY = null;
+	    mouseY = 0;
 	var PLATFORM_X = 3;
 	var PLATFORM_Y = 6;
 	var SCALE = 45;
@@ -10332,10 +10332,6 @@
 	    return window.world.createEntity(birdConfig, {
 	      x: x,
 	      y: y,
-	      $prevX: x,
-	      $prevY: y,
-	      $velX: 0,
-	      $velY: 0,
 	      radius: BIRD_TYPES[type]['radius'],
 	      image: BIRD_TYPES[type]['image'],
 	      $abilityTriggered: false,
@@ -10355,12 +10351,6 @@
 	          this.destroy();
 	        }
 	      },
-	      onTick: function onTick() {
-	        this.$prevX = this.$x, this.$prevY = this.$y, this.$x = this.position().x * window.world._ops.scale;
-	        this.$y = this.position().y * window.world._ops.scale;;
-	        this.$velX = this.$x - this.$prevX;
-	        this.$velY = this.$x - this.$prevY;
-	      },
 	      onKeyDown: function onKeyDown(e) {
 	        if (this.$abilityTriggered === false && this.$canSplit === true && this.$hasShot === true) {
 	          this.$abilityTriggered = true;
@@ -10369,11 +10359,9 @@
 	          var velX = this._body.m_linearVelocity.x;
 	          var velY = this._body.m_linearVelocity.y;
 	          var magnitude = Math.sqrt(velX * velX + velY * velY);
-	          var degrees = -90 - Math.atan(velY, velX) * 180 / Math.PI;
-
 	          this.applyImpulse(magnitude, velX, velY);
-	          birdA.applyImpulse(magnitude, velX, velY);
-	          birdB.applyImpulse(magnitude, velX, velY);
+	          birdA.applyImpulse(magnitude, velX - 1, velY - 1);
+	          birdB.applyImpulse(magnitude, velX + 1, velY + 1);
 	        }
 	      }
 	    });
@@ -10434,6 +10422,7 @@
 	var groundConfig = {
 	  name: "ground",
 	  shape: "square",
+	  color: "green",
 	  type: "static",
 	  width: 50,
 	  height: 10,
@@ -10537,7 +10526,7 @@
 	      radius: radius,
 	      $hits: 0,
 	      onImpact: function onImpact(entity, normal, tangential) {
-	        if (normal > 10 && entity.name() !== "ground") {
+	        if (normal > 10) {
 	          window.world._ops.$score++;
 	          this.$hits += normal;
 	        }
