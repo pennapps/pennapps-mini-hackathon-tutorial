@@ -2,6 +2,12 @@ var webpack = require('webpack');
 var path = require('path');
 
 module.exports = {
+  context: __dirname,
+  resolve: {
+    root: [
+      path.resolve(__dirname)
+    ]
+  },
   entry: [
     './components/Main.js'
   ],

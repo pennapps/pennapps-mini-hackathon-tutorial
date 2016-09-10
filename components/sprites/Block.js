@@ -1,5 +1,5 @@
-require("script!../lib/Box2dWeb-2.1.a.3.min.js");
-require("script!../lib/boxbox.min.js");
+require("script!lib/Box2dWeb-2.1.a.3.min.js");
+require("script!lib/boxbox.min.js");
 
 var block = {
   name: "block",

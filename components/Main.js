@@ -1,12 +1,12 @@
 import $ from 'jquery';
 
-require("script!../lib/Box2dWeb-2.1.a.3.min.js");
-require("script!../lib/boxbox.min.js");
+require("script!lib/Box2dWeb-2.1.a.3.min.js");
+require("script!lib/boxbox.min.js");
 
-import { birdConfig } from './Bird.js';
-import { getDist, getDegrees } from './helpers.js';
-import { block } from './Block.js';
-import { pig } from './Pig.js';
+import { createBird, birdConfig } from 'components/sprites/Bird.js';
+import { getDist, getDegrees } from 'components/helpers.js';
+import { block } from 'components/sprites/Block.js';
+import { pig } from 'components/sprites/Pig.js';
 
 $(document).ready( () => {
 
@@ -16,11 +16,16 @@ $(document).ready( () => {
   // create boxbox world 45 px = 1 meter
   let world = boxbox.createWorld(canvasElem, {
     collisionOutlines: false,
-    scale: 45,
+    scale: 15,
+    $score: 0,
+    onRender: function (ctx) {
+    }
   });
+  // add to global object
 
+  window.world = world;
   // add ground as static element
-  world.createEntity({
+  window.world.createEntity({
     name: "ground",
     shape: "square",
     type: "static",
@@ -32,34 +37,12 @@ $(document).ready( () => {
 
   /** BIRD CONSTRUCTION **/
   // see the Bird.js file. Need to specify OnKeyDown and OnRender in this scope
-  let bird = world.createEntity(birdConfig, {
-    x: 2,
-    score: 0,
-    $hit: false,
-    onKeyDown: function(e) {
-        this.$hit = true;
-        this.applyImpulse(200,60);
-        world.createEntity(birdConfig, {
-          x: this.position().x + 1,
-          y: this.position().y + 1
-        }).applyImpulse(200, 60);
-        world.createEntity(birdConfig, {
-          x: this.position().x  -1,
-          y: this.position().y - 1
-        }).applyImpulse(200, 60);
-        this.friction(0.1);
-    },
-    onRender: function(ctx) {
-      ctx.font = "20pt Arial";
-      ctx.fillText("Score: " + this._ops.score, 20, 20);
-    },
-  });
-    
+  let bird = createBird.bind(window)();  
   /** BLOCK CONSTRUCTION **/
 
   block.onImpact = function(entity, force) {
     if (entity.name() === "bird") {
-      bird._ops.score++;
+      window.world._ops.$score++;
       this.color("black");
     }
     if (force > 100 && entity.name() !== "aground") {
@@ -74,7 +57,7 @@ $(document).ready( () => {
       { x: 16, y: 4, width: 5, height: 0.5},
       { x: 13, color: "grey", onImpact: function(entity, force) {
           if (entity.name() === "bird") {
-            bird._ops.score++;
+            window.world._ops.$score++;
             this.color("white");
           }
           if (force > 75 && entity.name() !== "aground") {
